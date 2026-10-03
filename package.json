@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "ipv2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,24 +7,26 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
-    "@pinia/nuxt": "^0.5.1",
-    "flowbite": "^2.4.1",
-    "nuxt": "^3.12.3",
-    "pinia": "^2.1.7",
-    "pusher-js": "^8.4.0-rc2",
-    "vue": "latest"
+    "@pinia/nuxt": "^1.0.2",
+    "nuxt": "^4.5.2",
+    "pinia": "^4.0.3",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "vue": "^3.5.43"
   },
   "devDependencies": {
-    "@nuxtjs/i18n": "^8.3.1",
-    "@nuxtjs/tailwindcss": "^6.12.0",
-    "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
-    "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.13"
-  },
-  "overrides": {
-    "vue": "latest"
+    "@nuxt/test-utils": "^4.3.3",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^20.14.5",
+    "playwright-core": "^1.63.0",
+    "tailwindcss": "^4.3.3",
+    "vitest": "^5.0.3"
   }
 }
