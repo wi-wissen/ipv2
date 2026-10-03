@@ -1,112 +1,66 @@
-# [wip] ipv2.cc
+# IPv2 – Netzwerksimulation für den Informatikunterricht
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Jeder Browser-Tab wird zu einem Gerät (Client, DHCP-, DNS-, Webserver oder Router).
+Die Geräte tauschen simulierte Pakete aus und protokollieren jeden Schritt im
+TCP/IP-Schichtenmodell. Adressen sind bewusst vereinfacht: IP-Adressen bestehen aus
+`Netz.Host` (z. B. `10.5`), MAC-Adressen aus drei Bytes.
 
-## Available URLs
+**➜ [Benutzeranleitung mit Screenshots](docs/anleitung.md)**
 
-```
-/clients/browser  # Browser client
-/clients/dhcp     # DHCP client
-/clients/dns      # DNS client
-/clients/http     # HTTP client
-```
+![Client ruft eine Webseite ab](docs/bilder/03-client-webseite.png)
 
-## Environment Setup
+## Schnellstart
 
-The project requires a Pusher-compatible WebSocket server. We recommend using [Soketi](https://docs.soketi.app/), which is an open-source, self-hosted WebSocket server.
-
-Alternative Pusher-compatible servers:
-- [Pusher](https://pusher.com/) (hosted service)
-- [Laravel WebSockets](https://github.com/beyondcode/laravel-websockets) (self-hosted)
-- [Socket.IO](https://socket.io/) with [socket.io-pusher](https://github.com/socketsupply/socket.io-pusher)
-
-### Soketi Setup
-
-1. Install Soketi:
-   ```bash
-   npm install -g @soketi/soketi
-   ```
-
-2. Start Soketi server:
-   ```bash
-   soketi start
-   ```
-
-3. Rename `.env.example` to `.env` and configure:
-   ```env
-   DEBUG=false
-   SOKETI_HOST=localhost
-   SOKETI_PORT=6001
-   SOKETI_TLS=false
-   SOKETI_APP_KEY=app-key
-   ```
-
-## Setup
-
-Make sure to install the dependencies:
+Voraussetzung: Node.js ≥ 20.19
 
 ```bash
-# npm
 npm install
-# pnpm
-pnpm install
-# yarn
-yarn install
-# bun
-bun install
+npm run dev                          # Entwicklung: http://localhost:3000
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+Für den Unterricht (alle Rechner verbinden sich mit diesem Server):
 
 ```bash
-# npm
-npm run dev
-# pnpm
-pnpm run dev
-# yarn
-yarn dev
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
 npm run build
-# pnpm
-pnpm run build
-# yarn
-yarn build
-# bun
-bun run build
+node .output/server/index.mjs        # Port mit PORT=… änderbar
 ```
 
-Locally preview production build:
+## Skripte
 
-```bash
-# npm
-npm run preview
-# pnpm
-pnpm run preview
-# yarn
-yarn preview
-# bun
-bun run preview
+| Befehl | Zweck |
+|---|---|
+| `npm run dev` | Entwicklungsserver |
+| `npm run build` | Produktions-Build (Node-Server mit WebSocket-Hub) |
+| `npm run generate` | Statische Seite ohne Hub (verbindet nur Tabs im selben Browser) |
+| `npm test` | Alle Tests (Vitest) |
+| `npm run screenshots` | Screenshots für die Anleitung neu erstellen (App muss laufen, siehe Skript) |
+
+## Aufbau
+
+```
+app/
+  simulation/          Die Simulation – reines JavaScript, ohne Vue/Nuxt
+    Device.js          Ein Gerät mit allen Schichten
+    NetworkInterface.js  Netzwerkkarte: Kabel, Ethernet, ARP
+    layers/            PhysicalLayer, Ethernet, ARP, IPv2, UDP, TCP, DHCP, DNS, HTTP
+    media/             Übertragungsmedien: WebSocket, BroadcastChannel, Arbeitsspeicher (Tests)
+    address.js         IPv2- und MAC-Adressen
+    roles.js           Voreinstellungen der Gerätetypen
+  stores/              Pinia: Geräteeinstellungen (sessionStorage), Netzwerkname (localStorage), Protokoll
+  components/          Oberfläche (Options API)
+  pages/               Startseite und /device/[role]
+server/routes/_ws.js   WebSocket-Hub: verteilt Ethernet-Rahmen je Netzwerkname und Segment
+modules/               Workaround für den Nuxt-Dev-Server (WebSocket-Abbrüche)
+test/                  Vitest: simulation/ (Node) und components/ (Nuxt-Umgebung)
+docs/                  Benutzeranleitung und Screenshots
 ```
 
-## Todo List
+Ein Rahmen nimmt diesen Weg: `HTTP → TCP → IPv2 → Ethernet → Kabel → (Hub) → Kabel → Ethernet → IPv2 → TCP → HTTP`.
+Jede Schicht schreibt ins Protokoll; die Oberfläche zeigt es nach Schichten gefiltert an.
 
-- [ ] Add browser client functionality
-- [ ] Test DHCP client implementation
-- [ ] Test DNS client features
-- [ ] Test HTTP client functionality
-- [ ] Add index.vue routing and layout
-- [ ] Perform cross-browser testing
-- [ ] Test responsive design
-- [ ] Improve error handling
-- [ ] Document API endpoints
+## Konfiguration
+
+| Variable | Bedeutung |
+|---|---|
+| `NUXT_PUBLIC_WS_URL` | Anderer WebSocket-Hub, z. B. `wss://example.org/_ws` (Standard: derselbe Server unter `/_ws`) |
+| `PORT` | Port des Produktionsservers |

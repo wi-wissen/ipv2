@@ -1,26 +1,40 @@
+import tailwindcss from '@tailwindcss/vite'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
+
+  // Die Simulation läuft vollständig im Browser.
+  ssr: false,
+
   modules: [
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/i18n',
     '@pinia/nuxt',
-    '@pinia-plugin-persistedstate/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
   ],
+
+  css: ['~/assets/css/main.css'],
+
+  app: {
+    head: {
+      htmlAttrs: { lang: 'de' },
+      title: 'IPv2 – Netzwerksimulation',
+    },
+  },
+
   runtimeConfig: {
     public: {
-      debug: process.env.DEBUG,
-      pusherHost: process.env.SOKETI_HOST,
-      pusherPort: process.env.SOKETI_PORT,
-      pusherForceTLS: process.env.SOKETI_TLS,
-      pusherAppKey: process.env.SOKETI_APP_KEY,
-    }
+      // Optional: Adresse eines anderen WebSocket-Hubs, z. B. wss://example.org/_ws
+      wsUrl: '',
+    },
   },
-  routeRules: { // https://nuxt.com/docs/guide/concepts/rendering#route-rules
-    // renders only on client-side
-    '/client': { ssr : false },
-    '/services/*': { ssr : false },
-    '/clients/*': { ssr : false },
+
+  // WebSocket-Hub unter /_ws (server/routes/_ws.js)
+  nitro: {
+    experimental: { websocket: true },
+  },
+
+  vite: {
+    plugins: [tailwindcss()],
   },
 })
